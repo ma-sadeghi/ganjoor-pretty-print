@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   background: white;
   border-radius: 15px;
@@ -163,7 +163,7 @@ button:disabled {
 .hemistichs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 30px;
   align-items: center;
 }
 
@@ -193,10 +193,32 @@ button:disabled {
 
 /* Print Styles */
 @media print {
+  .hemistich:first-child {
+    text-align: left !important;
+    direction: left !important;
+  }
+
+  .hemistich:last-child {
+    text-align: right !important;
+    direction: rtl !important;
+  }
+
+  .hemistichs {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    align-items: center !important;
+  }
+
+  .verse {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
   body {
     background: white;
     margin: 0;
     padding: 0;
+    font-size: 0.8em;
   }
 
   .container {
@@ -231,12 +253,12 @@ button:disabled {
   }
 
   .hemistichs {
-    gap: 10px;
+    gap: 30px;
   }
 
   .poem-content {
     font-size: 1.1em;
-    line-height: 1.6;
+    line-height: 0.5;
   }
 
   .poem-header {
@@ -245,7 +267,7 @@ button:disabled {
   }
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .hemistichs {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -267,4 +289,4 @@ button:disabled {
   .poem-content {
     font-size: 1.1em;
   }
-}
+} */
