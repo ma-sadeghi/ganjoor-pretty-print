@@ -6,30 +6,32 @@ body {
     sans-serif;
   margin: 0;
   padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
-    url('background.jpg');
-  background-size: 1200px 1200px;
+  padding-top: 40px;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.80)),
+    url('background.png');
+  background-color: #FDF1E5;
+  background-size: 42vw 42vw;
   background-position: center center;
   background-attachment: fixed;
   background-repeat: repeat;
-  min-height: 100vh;
+  min-height: calc(100vh - 40px);
   min-width: 320px;
+  box-sizing: border-box;
 }
 
 .container {
   max-width: 1000px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
 
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #B3624D;
   color: white;
   padding: 30px;
   text-align: center;
@@ -78,20 +80,32 @@ input#urlInput {
 
 input[type="url"]:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #a0826d;
+  box-shadow: 0 0 0 3px rgba(160, 130, 109, 0.2);
 }
 
 button {
   font-family: "Vazirmatn", sans-serif;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #7ba05b;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
   transition: transform 0.2s;
+}
+
+#extractBtn {
+  background: #7ba05b;
+}
+
+button[onclick="loadSamplePoem()"] {
+  background: #8a909a !important;
+}
+
+button[onclick="processManualInput()"] {
+  background: #8a909a;
 }
 
 button:hover {
@@ -132,11 +146,6 @@ button:disabled {
 .poem-container {
   padding: 20px;
   display: none;
-  background-image: 
-    linear-gradient(45deg, rgba(102, 126, 234, 0.01) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(102, 126, 234, 0.01) 25%, transparent 25%);
-  background-size: 60px 60px;
-  background-position: 0 0, 30px 30px;
 }
 
 .poem-header {
@@ -171,9 +180,9 @@ button:disabled {
 .verse {
   margin-bottom: 12px;
   padding: 8px 15px;
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(160, 130, 109, 0.08);
   border-radius: 8px;
-  border-right: 4px solid #667eea;
+  border-right: 4px solid #a0826d;
 }
 
 .hemistichs {
@@ -202,7 +211,7 @@ button:disabled {
 }
 
 .print-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: #28a745;
   padding: 15px 30px;
   font-size: 18px;
 }
