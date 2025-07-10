@@ -15,6 +15,7 @@ body {
   background-attachment: fixed;
   background-repeat: repeat;
   min-height: 100vh;
+  min-width: 320px;
 }
 
 .container {
@@ -66,6 +67,8 @@ input[type="url"] {
   font-size: 16px;
   font-family: "Vazirmatn", sans-serif;
   direction: ltr;
+  text-align: left;
+  box-sizing: border-box;
 }
 
 input#urlInput {
@@ -281,7 +284,7 @@ button:disabled {
   }
 }
 
-/* @media (max-width: 768px) {
+@media (max-width: 768px) {
   .hemistichs {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -294,6 +297,19 @@ button:disabled {
 
   .input-group {
     flex-direction: column;
+    gap: 15px;
+  }
+
+  input[type="url"] {
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+
+  button {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
   }
 
   .header h1 {
@@ -303,4 +319,16 @@ button:disabled {
   .poem-content {
     font-size: 1.1em;
   }
-} */
+
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    border-radius: 10px;
+  }
+
+  .input-section {
+    padding: 20px;
+  }
+}
