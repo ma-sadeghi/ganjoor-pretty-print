@@ -293,8 +293,55 @@ function processManualInput() {
   setTimeout(hideStatus, 3000);
 }
 
-// Handle Enter key in URL input
+// Theme Management
+function initializeTheme() {
+  const themeToggle = document.getElementById('themeToggle');
+  const savedTheme = localStorage.getItem('theme');
+  
+  // Check for saved theme preference or default to auto (system preference)
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    themeToggle.textContent = '☀️';
+  } else if (savedTheme === 'light') {
+    document.body.classList.remove('dark-theme');
+    themeToggle.textContent = '🌙';
+  } else {
+    // Auto mode - follow system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      themeToggle.textContent = '☀️';
+    } else {
+      themeToggle.textContent = '🌙';
+    }
+  }
+}
+
+function toggleTheme() {
+  const themeToggle = document.getElementById('themeToggle');
+  const isDark = document.body.classList.contains('dark-theme');
+  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  if (isDark) {
+    // Currently dark -> switch to light
+    document.body.classList.remove('dark-theme');
+    themeToggle.textContent = '🌙';
+    localStorage.setItem('theme', 'light');
+  } else {
+    // Currently light -> switch to dark
+    document.body.classList.add('dark-theme');
+    themeToggle.textContent = '☀️';
+    localStorage.setItem('theme', 'dark');
+  }
+}
+
+// Handle Enter key in URL input and theme initialization
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize theme
+  initializeTheme();
+  
+  // Add theme toggle event listener
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  
+  // Handle Enter key in URL input
   document
     .getElementById("urlInput")
     .addEventListener("keypress", function (e) {
@@ -302,4 +349,14 @@ document.addEventListener('DOMContentLoaded', function() {
         extractPoem();
       }
     });
+    
+  // Listen for system theme changes
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      const savedTheme = localStorage.getItem('theme');
+      if (!savedTheme) { // Only auto-switch if no manual preference is saved
+        initializeTheme();
+      }
+    });
+  }
 });

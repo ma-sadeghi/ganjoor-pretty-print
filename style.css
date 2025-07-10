@@ -35,6 +35,30 @@ body {
   color: white;
   padding: 30px;
   text-align: center;
+  position: relative;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  width: 45px !important;
+  height: 45px !important;
+  font-size: 20px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.1) !important;
 }
 
 .header h1 {
@@ -340,4 +364,268 @@ button:disabled {
   .input-section {
     padding: 20px;
   }
+}
+
+/* Dark Theme - Auto Switch Based on System */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+    background-image:
+      linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+      url('background.png');
+    color: #e0e0e0;
+  }
+
+  .container {
+    background: rgba(40, 40, 40, 0.25);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .header {
+    background: #8B4513;
+    color: #f0f0f0;
+  }
+
+  .poem-header {
+    border-bottom: 2px solid #444;
+  }
+
+  .poet-name {
+    color: #e0e0e0;
+  }
+
+  .poem-title {
+    color: #b0b0b0;
+  }
+
+  .poem-content {
+    color: #e0e0e0;
+  }
+
+  .verse {
+    background: rgba(139, 69, 19, 0.15);
+    border-right: 4px solid #8B4513;
+  }
+
+  input[type="url"] {
+    background: rgba(60, 60, 60, 0.8);
+    border: 2px solid #555;
+    color: #e0e0e0;
+  }
+
+  input[type="url"]:focus {
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.3);
+    background: rgba(70, 70, 70, 0.9);
+  }
+
+  input[type="url"]::placeholder {
+    color: #999;
+  }
+
+  #extractBtn {
+    background: #6b8e5a;
+  }
+
+  button[onclick="loadSamplePoem()"],
+  button[onclick="processManualInput()"] {
+    background: #7a8085;
+  }
+
+  .print-btn {
+    background: #2d5a2d;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  .status.success {
+    background: rgba(76, 175, 80, 0.2);
+    color: #a5d6a7;
+    border: 1px solid #4caf50;
+  }
+
+  .status.error {
+    background: rgba(244, 67, 54, 0.2);
+    color: #ef9a9a;
+    border: 1px solid #f44336;
+  }
+
+  .status.loading {
+    background: rgba(33, 150, 243, 0.2);
+    color: #90caf9;
+    border: 1px solid #2196f3;
+  }
+
+  .input-section {
+    border-bottom: 1px solid #444;
+  }
+
+  .print-section {
+    border-top: 1px solid #444;
+  }
+
+  textarea {
+    background: rgba(60, 60, 60, 0.8);
+    border: 2px solid #555;
+    color: #e0e0e0;
+  }
+
+  textarea:focus {
+    border-color: #8B4513;
+    background: rgba(70, 70, 70, 0.9);
+  }
+
+  input[type="text"] {
+    background: rgba(60, 60, 60, 0.8);
+    border: 2px solid #555;
+    color: #e0e0e0;
+  }
+
+  input[type="text"]:focus {
+    border-color: #8B4513;
+    background: rgba(70, 70, 70, 0.9);
+  }
+
+  .theme-toggle {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+/* Manual Dark Theme Class */
+body.dark-theme {
+  background-color: #1a1a1a;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url('background.png');
+  color: #e0e0e0;
+}
+
+body.dark-theme .container {
+  background: rgba(40, 40, 40, 0.25);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-theme .header {
+  background: #8B4513;
+  color: #f0f0f0;
+}
+
+body.dark-theme .poem-header {
+  border-bottom: 2px solid #444;
+}
+
+body.dark-theme .poet-name {
+  color: #e0e0e0;
+}
+
+body.dark-theme .poem-title {
+  color: #b0b0b0;
+}
+
+body.dark-theme .poem-content {
+  color: #e0e0e0;
+}
+
+body.dark-theme .verse {
+  background: rgba(139, 69, 19, 0.15);
+  border-right: 4px solid #8B4513;
+}
+
+body.dark-theme input[type="url"] {
+  background: rgba(60, 60, 60, 0.8);
+  border: 2px solid #555;
+  color: #e0e0e0;
+}
+
+body.dark-theme input[type="url"]:focus {
+  border-color: #8B4513;
+  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.3);
+  background: rgba(70, 70, 70, 0.9);
+}
+
+body.dark-theme input[type="url"]::placeholder {
+  color: #999;
+}
+
+body.dark-theme #extractBtn {
+  background: #6b8e5a;
+}
+
+body.dark-theme button[onclick="loadSamplePoem()"],
+body.dark-theme button[onclick="processManualInput()"] {
+  background: #7a8085;
+}
+
+body.dark-theme .print-btn {
+  background: #2d5a2d;
+}
+
+body.dark-theme button:hover {
+  opacity: 0.9;
+}
+
+body.dark-theme .status.success {
+  background: rgba(76, 175, 80, 0.2);
+  color: #a5d6a7;
+  border: 1px solid #4caf50;
+}
+
+body.dark-theme .status.error {
+  background: rgba(244, 67, 54, 0.2);
+  color: #ef9a9a;
+  border: 1px solid #f44336;
+}
+
+body.dark-theme .status.loading {
+  background: rgba(33, 150, 243, 0.2);
+  color: #90caf9;
+  border: 1px solid #2196f3;
+}
+
+body.dark-theme .input-section {
+  border-bottom: 1px solid #444;
+}
+
+body.dark-theme .print-section {
+  border-top: 1px solid #444;
+}
+
+body.dark-theme textarea {
+  background: rgba(60, 60, 60, 0.8);
+  border: 2px solid #555;
+  color: #e0e0e0;
+}
+
+body.dark-theme textarea:focus {
+  border-color: #8B4513;
+  background: rgba(70, 70, 70, 0.9);
+}
+
+body.dark-theme input[type="text"] {
+  background: rgba(60, 60, 60, 0.8);
+  border: 2px solid #555;
+  color: #e0e0e0;
+}
+
+body.dark-theme input[type="text"]:focus {
+  border-color: #8B4513;
+  background: rgba(70, 70, 70, 0.9);
+}
+
+body.dark-theme .theme-toggle {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+body.dark-theme .theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.5) !important;
 }
