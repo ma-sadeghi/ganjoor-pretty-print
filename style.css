@@ -57,8 +57,8 @@
   --font-size-2xl: 1.3em;
   --font-size-3xl: 1.8em;
   --font-size-4xl: 2.5em;
-  --line-height-base: 1.8;
-  --line-height-print: 1.6;
+  --line-height-base: 1.2;
+  --line-height-print: 0.6;
   
   /* Layout */
   --container-max-width: 1000px;
@@ -406,7 +406,7 @@ button[onclick="processManualInput()"] {
   font-size: var(--font-size-xl);
   color: var(--text-primary);
   text-align: center;
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto;
 }
 
