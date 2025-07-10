@@ -1,74 +1,112 @@
 // ABOUTME: JavaScript functionality for Ganjoor Persian poetry pretty printer
 // ABOUTME: Handles API calls, poem parsing, display formatting, and user interactions
 
-function showStatus(message, type) {
-  const status = document.getElementById("status");
-  status.textContent = message;
-  status.className = `status ${type}`;
-  status.style.display = "block";
-}
+/* ========================================
+   Status Management Module
+   ======================================== */
+const StatusManager = {
+  show(message, type) {
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.className = `status ${type}`;
+    status.style.display = "block";
+  },
 
-function hideStatus() {
-  const status = document.getElementById("status");
-  status.style.display = "none";
-}
+  hide() {
+    const status = document.getElementById("status");
+    status.style.display = "none";
+  }
+};
 
+/* ========================================
+   API Module
+   ======================================== */
+const GanjoorAPI = {
+  async fetchPoemInfo(poemPath) {
+    const response = await fetch(
+      `https://api.ganjoor.net/api/ganjoor/poem?url=${encodeURIComponent(poemPath)}`
+    );
+    if (!response.ok) throw new Error(`کد خطا ${response.status}`);
+    return await response.json();
+  },
+
+  async fetchPoemVerses(poemId) {
+    const response = await fetch(
+      `https://api.ganjoor.net/api/ganjoor/poem/${poemId}/verses`
+    );
+    if (!response.ok) throw new Error(`کد خطا در دریافت ابیات ${response.status}`);
+    return await response.json();
+  },
+
+  async fetchRandomPoem() {
+    const response = await fetch("https://api.ganjoor.net/api/ganjoor/poem/random");
+    if (!response.ok) throw new Error(`کد خطا ${response.status}`);
+    return await response.json();
+  },
+
+  async fetchPoetInfo(poetId) {
+    const response = await fetch(`https://api.ganjoor.net/api/ganjoor/poet/${poetId}`);
+    if (!response.ok) throw new Error(`کد خطا ${response.status}`);
+    return await response.json();
+  }
+};
+
+/* ========================================
+   Poem Processing Module
+   ======================================== */
+const PoemProcessor = {
+  validateUrl(url) {
+    const pathMatch = url.match(/ganjoor\.net\/([^#?]+)/i);
+    return pathMatch ? "/" + pathMatch[1] : null;
+  },
+
+  processVerses(verses) {
+    return verses
+      .map((verse) => {
+        if (verse.hemistichs && verse.hemistichs.length > 0) {
+          return verse.hemistichs.map((h) => h.text || "").join("   ");
+        }
+        return verse.text || "";
+      })
+      .filter((line) => line.trim())
+      .join("\n");
+  },
+
+  extractPoetName(poemData) {
+    return poemData.category?.poet?.name || poemData.poetName || "شاعر ناشناس";
+  }
+};
+
+/* ========================================
+   Main Functions
+   ======================================== */
 async function extractPoem() {
   const urlInput = document.getElementById("urlInput").value.trim();
   const extractBtn = document.getElementById("extractBtn");
-  const pathMatch = urlInput.match(/ganjoor\.net\/([^#?]+)/i);
-
-  if (!pathMatch) {
-    showStatus("لینک وارد شده معتبر نیست.", "error");
+  
+  const poemPath = PoemProcessor.validateUrl(urlInput);
+  if (!poemPath) {
+    StatusManager.show("لینک وارد شده معتبر نیست.", "error");
     return;
   }
 
-  const poemPath = "/" + pathMatch[1]; // Add leading slash
-
   try {
-    showStatus("در حال دریافت شعر از API گنجور...", "loading");
+    StatusManager.show("در حال دریافت شعر از API گنجور...", "loading");
     extractBtn.disabled = true;
 
-    // First, get the poem basic info
-    const poemRes = await fetch(
-      `https://api.ganjoor.net/api/ganjoor/poem?url=${encodeURIComponent(
-        poemPath
-      )}`
-    );
-    if (!poemRes.ok) throw new Error(`کد خطا ${poemRes.status}`);
-
-    const poem = await poemRes.json();
-
-    // Then get the verses using the poem ID
-    const versesRes = await fetch(
-      `https://api.ganjoor.net/api/ganjoor/poem/${poem.id}/verses`
-    );
-    if (!versesRes.ok)
-      throw new Error(`کد خطا در دریافت ابیات ${versesRes.status}`);
-
-    const verses = await versesRes.json();
+    const poem = await GanjoorAPI.fetchPoemInfo(poemPath);
+    const verses = await GanjoorAPI.fetchPoemVerses(poem.id);
 
     const title = poem.title || "بدون عنوان";
-    const poet =
-      poem.category?.poet?.name || poem.poetName || "شاعر ناشناس";
+    const poet = PoemProcessor.extractPoetName(poem);
+    const poemText = PoemProcessor.processVerses(verses);
 
-    // Process verses - each verse may have multiple hemistichs
-    const poemText = verses
-      .map((verse) => {
-        if (verse.hemistichs && verse.hemistichs.length > 0) {
-          return verse.hemistichs.map((h) => h.text || "").join("   "); // Join hemistichs with spacing
-        }
-        return verse.text || ""; // Fallback to verse.text if hemistichs not available
-      })
-      .filter((line) => line.trim()) // Remove empty lines
-      .join("\n");
-
-    displayPoem(poet, title, poemText);
-    showStatus("شعر با موفقیت استخراج شد!", "success");
-    setTimeout(hideStatus, 3000);
+    PoemDisplay.render(poet, title, poemText);
+    StatusManager.show("شعر با موفقیت استخراج شد!", "success");
+    setTimeout(StatusManager.hide, 3000);
   } catch (err) {
     console.error(err);
-    showStatus("خطا در دریافت شعر: " + err.message, "error");
+    StatusManager.show("خطا در دریافت شعر: " + err.message, "error");
   } finally {
     extractBtn.disabled = false;
   }
@@ -148,55 +186,65 @@ function extractPoemTitle(doc) {
   return "بدون عنوان";
 }
 
-function displayPoem(poetName, poemTitle, poemText) {
-  document.getElementById("poetName").textContent = poetName;
-  document.getElementById("poemTitle").textContent = poemTitle;
+/* ========================================
+   Display Module
+   ======================================== */
+const PoemDisplay = {
+  render(poetName, poemTitle, poemText) {
+    document.getElementById("poetName").textContent = poetName;
+    document.getElementById("poemTitle").textContent = poemTitle;
 
-  const poemContent = document.getElementById("poemContent");
-  const lines = poemText
-    .split("\n")
-    .filter((line) => line.trim().length > 0);
+    const poemContent = document.getElementById("poemContent");
+    const lines = poemText
+      .split("\n")
+      .filter((line) => line.trim().length > 0);
 
-  let formattedPoem = "";
+    let formattedPoem = "";
 
-  for (let i = 0; i < lines.length; i += 2) {
-    const line1 = lines[i];
-    const line2 = lines[i + 1];
+    for (let i = 0; i < lines.length; i += 2) {
+      const line1 = lines[i];
+      const line2 = lines[i + 1];
 
-    if (line1 && line2) {
-      // Two lines - create hemistichs
-      formattedPoem += `
-                    <div class="verse">
-                        <div class="hemistichs">
-                            <div class="hemistich">${line1}</div>
-                            <div class="hemistich">${line2}</div>
+      if (line1 && line2) {
+        // Two lines - create hemistichs
+        formattedPoem += `
+                        <div class="verse">
+                            <div class="hemistichs">
+                                <div class="hemistich">${line1}</div>
+                                <div class="hemistich">${line2}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
-    } else if (line1) {
-      // Single line
-      formattedPoem += `
-                    <div class="verse">
-                        <div style="text-align: center;">${line1}</div>
-                    </div>
-                `;
+                    `;
+      } else if (line1) {
+        // Single line
+        formattedPoem += `
+                        <div class="verse">
+                            <div style="text-align: center;">${line1}</div>
+                        </div>
+                    `;
+      }
     }
-  }
 
-  poemContent.innerHTML = formattedPoem;
-  document.getElementById("poemContainer").style.display = "block";
-  document.getElementById("printSection").style.display = "block";
+    poemContent.innerHTML = formattedPoem;
+    document.getElementById("poemContainer").style.display = "block";
+    document.getElementById("printSection").style.display = "block";
+  },
+
+  showManualInputSection() {
+    document.getElementById("manualSection").style.display = "block";
+  }
+};
+
+// Legacy function for backward compatibility
+function displayPoem(poetName, poemTitle, poemText) {
+  PoemDisplay.render(poetName, poemTitle, poemText);
 }
 
 async function loadSamplePoem() {
   try {
-    showStatus("در حال دریافت شعر تصادفی...", "loading");
+    StatusManager.show("در حال دریافت شعر تصادفی...", "loading");
 
-    // Get random poem
-    const randomRes = await fetch("https://api.ganjoor.net/api/ganjoor/poem/random");
-    if (!randomRes.ok) throw new Error(`کد خطا ${randomRes.status}`);
-
-    const randomPoem = await randomRes.json();
+    const randomPoem = await GanjoorAPI.fetchRandomPoem();
     console.log("Random poem response:", randomPoem);
 
     // Get poet info using poet ID
@@ -206,15 +254,10 @@ async function loadSamplePoem() {
     if (poetId) {
       console.log("Found poet ID:", poetId);
       try {
-        const poetRes = await fetch(`https://api.ganjoor.net/api/ganjoor/poet/${poetId}`);
-        if (poetRes.ok) {
-          const poetInfo = await poetRes.json();
-          console.log("Poet info response:", poetInfo);
-          poetName = poetInfo.poet?.name || poetInfo.poet?.nickname || poetInfo.name || poetInfo.nickname || poetName;
-          console.log("Final poet name:", poetName);
-        } else {
-          console.warn("Poet API response not ok:", poetRes.status);
-        }
+        const poetInfo = await GanjoorAPI.fetchPoetInfo(poetId);
+        console.log("Poet info response:", poetInfo);
+        poetName = poetInfo.poet?.name || poetInfo.poet?.nickname || poetInfo.name || poetInfo.nickname || poetName;
+        console.log("Final poet name:", poetName);
       } catch (poetErr) {
         console.warn("Could not fetch poet info:", poetErr);
       }
@@ -224,38 +267,21 @@ async function loadSamplePoem() {
       console.log("Sections:", randomPoem.sections);
     }
 
-    // Get verses for the random poem
-    const versesRes = await fetch(
-      `https://api.ganjoor.net/api/ganjoor/poem/${randomPoem.id}/verses`
-    );
-    if (!versesRes.ok) throw new Error(`کد خطا در دریافت ابیات ${versesRes.status}`);
-
-    const verses = await versesRes.json();
-
+    const verses = await GanjoorAPI.fetchPoemVerses(randomPoem.id);
     const title = randomPoem.fullTitle || randomPoem.title || "بدون عنوان";
+    const poemText = PoemProcessor.processVerses(verses);
 
-    // Process verses
-    const poemText = verses
-      .map((verse) => {
-        if (verse.hemistichs && verse.hemistichs.length > 0) {
-          return verse.hemistichs.map((h) => h.text || "").join("   ");
-        }
-        return verse.text || "";
-      })
-      .filter((line) => line.trim())
-      .join("\n");
-
-    displayPoem(poetName, title, poemText);
-    showStatus("شعر تصادفی بارگذاری شد!", "success");
-    setTimeout(hideStatus, 3000);
+    PoemDisplay.render(poetName, title, poemText);
+    StatusManager.show("شعر تصادفی بارگذاری شد!", "success");
+    setTimeout(StatusManager.hide, 3000);
   } catch (err) {
     console.error(err);
-    showStatus("خطا در دریافت شعر تصادفی: " + err.message, "error");
+    StatusManager.show("خطا در دریافت شعر تصادفی: " + err.message, "error");
   }
 }
 
 function showManualInputOption() {
-  document.getElementById("manualSection").style.display = "block";
+  PoemDisplay.showManualInputSection();
 
   // Try to pre-fill with the sample poem if available
   const samplePoem = `بیچاره آدمی که گرفتار عقل شد
@@ -284,62 +310,87 @@ function processManualInput() {
   const poemText = document.getElementById("manualPoemText").value.trim();
 
   if (!poemText) {
-    showStatus("لطفاً متن شعر را وارد کنید.", "error");
+    StatusManager.show("لطفاً متن شعر را وارد کنید.", "error");
     return;
   }
 
-  displayPoem(poetName, poemTitle, poemText);
-  showStatus("شعر با موفقیت نمایش داده شد!", "success");
-  setTimeout(hideStatus, 3000);
+  PoemDisplay.render(poetName, poemTitle, poemText);
+  StatusManager.show("شعر با موفقیت نمایش داده شد!", "success");
+  setTimeout(StatusManager.hide, 3000);
 }
 
-// Theme Management
-function initializeTheme() {
-  const themeToggle = document.getElementById('themeToggle');
-  const savedTheme = localStorage.getItem('theme');
-  
-  // Check for saved theme preference or default to auto (system preference)
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-    themeToggle.textContent = '☀️';
-  } else if (savedTheme === 'light') {
-    document.body.classList.remove('dark-theme');
-    themeToggle.textContent = '🌙';
-  } else {
-    // Auto mode - follow system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+/* ========================================
+   Theme Management Module
+   ======================================== */
+const ThemeManager = {
+  initialize() {
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    
+    // Check for saved theme preference or default to auto (system preference)
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-theme');
       themeToggle.textContent = '☀️';
-    } else {
+    } else if (savedTheme === 'light') {
+      document.body.classList.remove('dark-theme');
       themeToggle.textContent = '🌙';
+    } else {
+      // Auto mode - follow system preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        themeToggle.textContent = '☀️';
+      } else {
+        themeToggle.textContent = '🌙';
+      }
+    }
+  },
+
+  toggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    const isDark = document.body.classList.contains('dark-theme');
+    
+    if (isDark) {
+      // Currently dark -> switch to light
+      document.body.classList.remove('dark-theme');
+      themeToggle.textContent = '🌙';
+      localStorage.setItem('theme', 'light');
+    } else {
+      // Currently light -> switch to dark
+      document.body.classList.add('dark-theme');
+      themeToggle.textContent = '☀️';
+      localStorage.setItem('theme', 'dark');
+    }
+  },
+
+  setupSystemListener() {
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme) { // Only auto-switch if no manual preference is saved
+          ThemeManager.initialize();
+        }
+      });
     }
   }
+};
+
+// Legacy functions for backward compatibility
+function initializeTheme() {
+  ThemeManager.initialize();
 }
 
 function toggleTheme() {
-  const themeToggle = document.getElementById('themeToggle');
-  const isDark = document.body.classList.contains('dark-theme');
-  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  if (isDark) {
-    // Currently dark -> switch to light
-    document.body.classList.remove('dark-theme');
-    themeToggle.textContent = '🌙';
-    localStorage.setItem('theme', 'light');
-  } else {
-    // Currently light -> switch to dark
-    document.body.classList.add('dark-theme');
-    themeToggle.textContent = '☀️';
-    localStorage.setItem('theme', 'dark');
-  }
+  ThemeManager.toggle();
 }
 
-// Handle Enter key in URL input and theme initialization
+/* ========================================
+   Application Initialization
+   ======================================== */
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize theme
-  initializeTheme();
+  ThemeManager.initialize();
   
   // Add theme toggle event listener
-  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('themeToggle').addEventListener('click', ThemeManager.toggle);
   
   // Handle Enter key in URL input
   document
@@ -350,13 +401,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-  // Listen for system theme changes
-  if (window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-      const savedTheme = localStorage.getItem('theme');
-      if (!savedTheme) { // Only auto-switch if no manual preference is saved
-        initializeTheme();
-      }
-    });
-  }
+  // Setup system theme change listener
+  ThemeManager.setupSystemListener();
 });
