@@ -7,15 +7,23 @@ body {
   margin: 0;
   padding: 20px;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
+    url('background.jpg');
+  background-size: 1200px 1200px;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: repeat;
   min-height: 100vh;
 }
 
 .container {
   max-width: 1000px;
   margin: 0 auto;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
 
@@ -121,6 +129,11 @@ button:disabled {
 .poem-container {
   padding: 20px;
   display: none;
+  background-image: 
+    linear-gradient(45deg, rgba(102, 126, 234, 0.01) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(102, 126, 234, 0.01) 25%, transparent 25%);
+  background-size: 60px 60px;
+  background-position: 0 0, 30px 30px;
 }
 
 .poem-header {
@@ -230,7 +243,7 @@ button:disabled {
   .header {
     background: #333 !important;
     -webkit-print-color-adjust: exact;
-    color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   .header,
