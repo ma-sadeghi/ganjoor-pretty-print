@@ -233,10 +233,11 @@ button:disabled {
     color-adjust: exact;
   }
 
+  .header,
   .input-section,
   .print-section,
   footer {
-    display: none;
+    display: none !important;
   }
 
   .poem-container {
